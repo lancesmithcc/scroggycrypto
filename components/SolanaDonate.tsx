@@ -103,15 +103,15 @@ export default function SolanaDonate() {
 
   return (
     <>
-      {/* Floating Donate Button */}
+      {/* Bottom Donate Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-24 left-8 z-40 bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-xl font-bold shadow-2xl hover:shadow-purple-500/50 transition-all flex items-center gap-2 border-2 border-purple-400"
+        className="w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-4 rounded-xl font-bold shadow-2xl hover:shadow-purple-500/50 transition-all flex items-center justify-center gap-3 border-2 border-purple-400"
       >
-        <span className="text-2xl">☀️</span>
-        <span>Support Casino</span>
+        <span className="text-3xl">☀️</span>
+        <span className="text-lg">Support Scroggy - Donate SOL</span>
       </motion.button>
 
       {/* Donation Modal */}

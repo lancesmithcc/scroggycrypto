@@ -437,8 +437,10 @@ export default function GamePage() {
         <p>Powered by Blockchain Based ScroggyCoin utility tokens • For entertainment only • No real monetary value</p>
       </footer>
 
-      {/* Solana Donation Button */}
-      <SolanaDonate />
+      {/* Solana Donation Button - Very Bottom */}
+      <div className="max-w-7xl mx-auto mt-8 px-4">
+        <SolanaDonate />
+      </div>
     </div>
   );
 }
