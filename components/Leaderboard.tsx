@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { LeaderboardEntry } from '@/lib/types';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -23,6 +25,42 @@ export default function Leaderboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
+    
+    // Play refresh sound
+    if (typeof window !== 'undefined') {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Ascending tone sequence for refresh
+      [600, 700, 800].forEach((freq, i) => {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.start();
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+          oscillator.stop(audioContext.currentTime + 0.1);
+        }, i * 80);
+      });
+    }
+    
+    await fetchLeaderboard();
+    
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   const getMedalEmoji = (rank: number) => {
@@ -96,12 +134,30 @@ export default function Leaderboard() {
       )}
 
       <div className="mt-6 text-center">
-        <button
-          onClick={fetchLeaderboard}
-          className="text-sm text-casino-gold hover:text-yellow-400 transition-colors"
+        <motion.button
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          whileHover={{ scale: isRefreshing ? 1 : 1.05 }}
+          whileTap={{ scale: isRefreshing ? 1 : 0.95 }}
+          className="text-sm font-semibold text-casino-gold hover:text-yellow-400 transition-colors px-4 py-2 rounded-lg border border-casino-gold/30 hover:border-casino-gold disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
         >
-          🔄 Refresh Leaderboard
-        </button>
+          <motion.div
+            className="absolute inset-0 bg-casino-gold/10"
+            initial={{ x: '-100%' }}
+            whileHover={{ x: '100%' }}
+            transition={{ duration: 0.5 }}
+          />
+          <motion.span
+            animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
+            transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
+            className="inline-block mr-2"
+          >
+            🔄
+          </motion.span>
+          <span className="relative z-10">
+            {isRefreshing ? 'Refreshing...' : 'Refresh Leaderboard'}
+          </span>
+        </motion.button>
       </div>
     </div>
   );
