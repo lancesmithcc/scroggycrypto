@@ -11,9 +11,17 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [status, setStatus] = useState<string>('');
+  const [tokenAmount, setTokenAmount] = useState(100);
 
   const CASINO_WALLET = process.env.NEXT_PUBLIC_SOLANA_ADDRESS || '';
-  const PRICE_PER_100_TOKENS = 0.05; // 0.05 SOL = 100 ScroggyCoins
+  const PRICE_PER_100_TOKENS = 0.005; // 0.005 SOL = 100 ScroggyCoins
+  
+  // Calculate SOL cost based on token amount
+  const calculateCost = (tokens: number) => {
+    return (tokens / 100) * PRICE_PER_100_TOKENS;
+  };
+  
+  const solCost = calculateCost(tokenAmount);
 
   const handlePurchase = async () => {
     if (!window.solana || !window.solana.isPhantom) {
@@ -42,7 +50,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
       
       const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
       const connection = new Connection(rpcUrl);
-      const lamports = Math.floor(PRICE_PER_100_TOKENS * LAMPORTS_PER_SOL);
+      const lamports = Math.floor(solCost * LAMPORTS_PER_SOL);
 
       const transaction = new Transaction().add(
         SystemProgram.transfer({
@@ -62,7 +70,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
       console.log('✅ Payment transaction:', signed.signature);
       setStatus('🎰 Adding tokens to your balance...');
 
-      // Call API to add 100 tokens
+      // Call API to add tokens
       const response = await fetch('/api/player/buy-tokens', {
         method: 'POST',
         headers: {
@@ -70,7 +78,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
         },
         body: JSON.stringify({
           transactionSignature: signed.signature,
-          amount: 100,
+          amount: tokenAmount,
         }),
       });
 
@@ -124,10 +132,16 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="text-sm font-semibold bg-gradient-to-r from-casino-gold to-yellow-500 text-casino-dark px-6 py-3 rounded-lg hover:from-yellow-500 hover:to-casino-gold transition-all shadow-lg hover:shadow-casino-gold/50 flex items-center justify-center gap-2 w-full"
+        className="text-sm font-semibold bg-gradient-to-r from-casino-gold to-yellow-500 text-casino-dark px-6 py-3 rounded-lg hover:from-yellow-500 hover:to-casino-gold transition-all shadow-lg hover:shadow-casino-gold/50 flex items-center justify-center gap-2 w-full relative overflow-hidden group"
       >
-        <span className="text-2xl">🪙</span>
-        <span>Buy 100 ScroggyCoins</span>
+        <motion.div
+          className="absolute inset-0 bg-white/20"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '100%' }}
+          transition={{ duration: 0.5 }}
+        />
+        <span className="text-2xl relative z-10">🪙</span>
+        <span className="relative z-10">Buy ScroggyCoins</span>
       </motion.button>
 
       {/* Purchase Modal */}
@@ -147,17 +161,55 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
             </div>
 
             <div className="space-y-4">
-              {/* Package Details */}
+              {/* Token Amount Input */}
+              <div>
+                <label className="block text-white font-semibold mb-2">
+                  How many ScroggyCoins?
+                </label>
+                <input
+                  type="number"
+                  value={tokenAmount}
+                  onChange={(e) => setTokenAmount(Math.max(10, parseInt(e.target.value) || 100))}
+                  step="10"
+                  min="10"
+                  className="w-full bg-casino-darker border-2 border-casino-gold/30 rounded-lg px-4 py-3 text-white text-xl font-bold focus:border-casino-gold focus:outline-none"
+                  disabled={isPurchasing}
+                />
+                {/* Preset Package Buttons */}
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {[
+                    { tokens: 100, label: '100' },
+                    { tokens: 250, label: '250' },
+                    { tokens: 500, label: '500' },
+                    { tokens: 1000, label: '1K' },
+                  ].map((pkg) => (
+                    <button
+                      key={pkg.tokens}
+                      onClick={() => setTokenAmount(pkg.tokens)}
+                      className={`py-2 px-1 rounded-lg text-sm font-bold transition-all ${
+                        tokenAmount === pkg.tokens
+                          ? 'bg-casino-gold text-casino-dark'
+                          : 'bg-casino-darker hover:bg-casino-gold/30 border border-casino-gold/30 hover:border-casino-gold text-white'
+                      }`}
+                      disabled={isPurchasing}
+                    >
+                      {pkg.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Display */}
               <div className="bg-gradient-to-r from-casino-gold/20 to-yellow-500/20 border-2 border-casino-gold rounded-xl p-6">
                 <div className="text-center">
-                  <p className="text-4xl font-bold text-casino-gold mb-2">100</p>
+                  <p className="text-5xl font-bold text-casino-gold mb-2">{tokenAmount}</p>
                   <p className="text-white text-lg mb-3">ScroggyCoins</p>
                   <div className="flex items-center justify-center gap-2 text-2xl">
                     <span className="text-purple-400">☀️</span>
-                    <span className="text-white font-bold">{PRICE_PER_100_TOKENS} SOL</span>
+                    <span className="text-white font-bold">{solCost.toFixed(4)} SOL</span>
                   </div>
                   <p className="text-xs text-gray-400 mt-2">
-                    (Includes network fees)
+                    Rate: 0.005 SOL per 100 tokens
                   </p>
                 </div>
               </div>
