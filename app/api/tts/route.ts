@@ -5,7 +5,7 @@ const KOKORO_API_BASE = 'https://kokoro.lancesmith.cc/api/v1';
 
 export async function POST(request: Request) {
   try {
-    const { text, voice = 'am_michael', speed = 1, model = 'model_q8f16' } = await request.json();
+    const { text, voice = 'am_santa', speed = 1, model = 'model_q8f16' } = await request.json();
 
     if (!text) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });

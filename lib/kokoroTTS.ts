@@ -21,7 +21,7 @@ export async function generateVoice(options: KokoroVoiceOptions): Promise<string
       },
       body: JSON.stringify({
         text: options.text,
-        voice: options.voice || 'am_michael',
+        voice: options.voice || 'am_santa', // Santa voice! 🎅
         speed: options.speed || 1,
         model: options.model || 'model_q8f16',
       }),
@@ -51,8 +51,8 @@ export async function generateVoice(options: KokoroVoiceOptions): Promise<string
   }
 }
 
-// Client-side voice player
-export async function playVoice(text: string, voice: string = 'am_michael', speed: number = 1): Promise<void> {
+// Client-side voice player (using Santa voice by default! 🎅)
+export async function playVoice(text: string, voice: string = 'am_santa', speed: number = 1): Promise<void> {
   try {
     console.log('🎙️ Attempting to play voice:', text);
     const audioUrl = await generateVoice({ text, voice, speed });
@@ -108,21 +108,21 @@ export async function playVoice(text: string, voice: string = 'am_michael', spee
   }
 }
 
-// Threatening messages for out of tokens
+// Threatening messages for out of tokens - ALL USING SANTA VOICE! 🎅
 export const GANGSTER_MESSAGES = [
-  { text: "That's it! I'm gonna break your knees!", character: '🤵', voice: 'am_michael' },
-  { text: "You're outta tokens, punk! Time to pay up!", character: '🤵', voice: 'am_michael' },
-  { text: "Empty pockets? Empty life! Get lost!", character: '🤵', voice: 'am_michael' },
-  { text: "You think this is a charity? Beat it!", character: '🤵', voice: 'am_michael' },
-  { text: "No money, no play! Capisce?!", character: '🤵', voice: 'am_michael' },
+  { text: "That's it! I'm gonna break your knees!", character: '🤵', voice: 'am_santa' },
+  { text: "You're outta tokens, punk! Time to pay up!", character: '🤵', voice: 'am_santa' },
+  { text: "Empty pockets? Empty life! Get lost!", character: '🤵', voice: 'am_santa' },
+  { text: "You think this is a charity? Beat it!", character: '🤵', voice: 'am_santa' },
+  { text: "No money, no play! Capisce?!", character: '🤵', voice: 'am_santa' },
 ];
 
 export const COP_MESSAGES = [
-  { text: "You're going to jail, punk!", character: '👮', voice: 'am_adam' },
-  { text: "Hands up! You're under arrest for being broke!", character: '👮', voice: 'am_adam' },
-  { text: "That's it, buddy! Downtown, NOW!", character: '👮', voice: 'am_adam' },
-  { text: "Out of tokens? Out of luck! You're coming with me!", character: '👮', voice: 'am_adam' },
-  { text: "Book 'em! Gambling without funds!", character: '👮', voice: 'am_adam' },
+  { text: "You're going to jail, punk!", character: '👮', voice: 'am_santa' },
+  { text: "Hands up! You're under arrest for being broke!", character: '👮', voice: 'am_santa' },
+  { text: "That's it, buddy! Downtown, NOW!", character: '👮', voice: 'am_santa' },
+  { text: "Out of tokens? Out of luck! You're coming with me!", character: '👮', voice: 'am_santa' },
+  { text: "Book 'em! Gambling without funds!", character: '👮', voice: 'am_santa' },
 ];
 
 export function getRandomThreat(): { text: string; character: string; voice: string } {
