@@ -16,67 +16,22 @@ export default function GamePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      fetchPlayerData();
-    }
-  }, [user]);
+    fetchPlayerData();
+  }, []);
 
   const fetchPlayerData = async () => {
     try {
-      if (!user) {
-        setError('User not authenticated');
-        setLoading(false);
-        return;
-      }
-
-      // Use localStorage for Netlify deployment
-      if (isLocalStorageAvailable()) {
-        const playerData = getCurrentPlayerLocal(
-          user.id,
-          user.username || user.firstName || 'Player'
-        );
-        setPlayer(playerData);
-        setLoading(false);
+      const response = await fetch('/api/player');
+      if (response.ok) {
+        const data = await response.json();
+        setPlayer(data);
       } else {
-        // Fallback: try API (for local development)
-        const response = await fetch('/api/player');
-        if (response.ok) {
-          const data = await response.json();
-          setPlayer(data);
-        } else {
-          // If API fails, create a temporary player
-          const tempPlayer: Player = {
-            userId: user.id,
-            username: user.username || user.firstName || 'Player',
-            balance: INITIAL_BALANCE,
-            totalWins: 0,
-            totalLosses: 0,
-            biggestWin: 0,
-            gamesPlayed: 0,
-            createdAt: new Date().toISOString(),
-            lastPlayed: new Date().toISOString(),
-          };
-          setPlayer(tempPlayer);
-        }
-        setLoading(false);
+        setError('Failed to load player data');
       }
     } catch (err) {
-      console.error('Error loading player data:', err);
-      // Create temporary player on error
-      if (user) {
-        const tempPlayer: Player = {
-          userId: user.id,
-          username: user.username || user.firstName || 'Player',
-          balance: INITIAL_BALANCE,
-          totalWins: 0,
-          totalLosses: 0,
-          biggestWin: 0,
-          gamesPlayed: 0,
-          createdAt: new Date().toISOString(),
-          lastPlayed: new Date().toISOString(),
-        };
-        setPlayer(tempPlayer);
-      }
+      setError('Error loading player data');
+      console.error(err);
+    } finally {
       setLoading(false);
     }
   };
