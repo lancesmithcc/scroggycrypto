@@ -11,6 +11,16 @@ export default function SolanaDonate() {
 
   const CASINO_WALLET = process.env.NEXT_PUBLIC_SOLANA_ADDRESS || '';
 
+  // Log wallet configuration on component mount
+  if (typeof window !== 'undefined') {
+    console.log('💰 Donation wallet configured:', CASINO_WALLET ? '✅ Yes' : '❌ No');
+    if (CASINO_WALLET) {
+      console.log('💰 Wallet address:', CASINO_WALLET);
+    } else {
+      console.warn('⚠️ NEXT_PUBLIC_SOLANA_ADDRESS not set - donations disabled');
+    }
+  }
+
   const handleDonate = async () => {
     if (!window.solana || !window.solana.isPhantom) {
       setStatus('❌ Phantom Wallet not found! Please install it from phantom.app');
@@ -143,11 +153,25 @@ export default function SolanaDonate() {
               </div>
 
               {/* Casino Wallet Address */}
-              <div className="bg-casino-darker rounded-lg p-3">
+              <div className={`rounded-lg p-3 ${CASINO_WALLET ? 'bg-casino-darker' : 'bg-red-900/20 border border-red-500/30'}`}>
                 <p className="text-xs text-gray-400 mb-1">Casino Wallet:</p>
-                <p className="text-xs text-purple-400 font-mono break-all">
-                  {CASINO_WALLET || 'Not configured'}
-                </p>
+                {CASINO_WALLET ? (
+                  <p className="text-xs text-purple-400 font-mono break-all">
+                    {CASINO_WALLET}
+                  </p>
+                ) : (
+                  <div className="space-y-1">
+                    <p className="text-xs text-red-400 font-bold">
+                      ⚠️ Not configured
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Add NEXT_PUBLIC_SOLANA_ADDRESS to Netlify environment variables
+                    </p>
+                    <p className="text-xs text-gray-500 italic">
+                      See DONATION_SETUP.md for instructions
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Status Message */}
