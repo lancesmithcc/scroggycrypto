@@ -20,6 +20,7 @@ export default function GamePage() {
   const [error, setError] = useState<string | null>(null);
   const [threat, setThreat] = useState<{ text: string; character: string; voice: string } | null>(null);
   const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [hasPlayedWelcome, setHasPlayedWelcome] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -83,6 +84,16 @@ export default function GamePage() {
     if (!player) return;
     
     try {
+      // Play welcome.mp3 on first spin!
+      if (!hasPlayedWelcome) {
+        setHasPlayedWelcome(true);
+        const welcomeAudio = new Audio('/welcome.mp3');
+        welcomeAudio.volume = 0.7;
+        welcomeAudio.play().catch(err => {
+          console.log('Welcome audio autoplay blocked:', err);
+        });
+      }
+
       // OPTIMISTIC UPDATE: Update balance immediately on client-side
       const optimisticBalance = player.balance - betAmount;
       setPlayer({
