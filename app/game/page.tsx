@@ -86,12 +86,28 @@ export default function GamePage() {
     try {
       // Play welcome.mp3 on first spin!
       if (!hasPlayedWelcome) {
+        console.log('🎵 Playing welcome audio...');
         setHasPlayedWelcome(true);
-        const welcomeAudio = new Audio('/welcome.mp3');
-        welcomeAudio.volume = 0.7;
-        welcomeAudio.play().catch(err => {
-          console.log('Welcome audio autoplay blocked:', err);
-        });
+        
+        try {
+          const welcomeAudio = new Audio('/welcome.mp3');
+          welcomeAudio.volume = 0.7;
+          
+          // Try to play
+          await welcomeAudio.play();
+          console.log('✅ Welcome audio playing');
+          
+          welcomeAudio.onended = () => {
+            console.log('✅ Welcome audio finished');
+          };
+          
+          welcomeAudio.onerror = (err) => {
+            console.error('❌ Welcome audio error:', err);
+          };
+        } catch (err) {
+          console.warn('⚠️ Welcome audio blocked by browser:', err);
+          // Not critical, continue with spin
+        }
       }
 
       // OPTIMISTIC UPDATE: Update balance immediately on client-side

@@ -41,7 +41,14 @@ export default function SolanaDonate() {
       // Request transaction
       const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
       
-      const connection = new Connection('https://api.mainnet-beta.solana.com');
+      // Use custom RPC URL or default to devnet (free and no rate limits)
+      // For production: Set NEXT_PUBLIC_SOLANA_RPC_URL to a paid RPC endpoint
+      // (Helius, QuickNode, Alchemy - see SOLANA_RPC_SETUP.md)
+      const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+      
+      console.log('🔗 Using Solana RPC:', rpcUrl.includes('devnet') ? 'Devnet (testing)' : 'Mainnet/Custom');
+      
+      const connection = new Connection(rpcUrl);
       const lamports = Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL);
 
       const transaction = new Transaction().add(
