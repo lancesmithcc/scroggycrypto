@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import ScroggyCoin from './ScroggyCoin';
 
 interface BuyTokensProps {
   onPurchaseComplete: () => void;
@@ -140,7 +141,9 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
           whileHover={{ x: '100%' }}
           transition={{ duration: 0.5 }}
         />
-        <span className="text-2xl relative z-10">🪙</span>
+        <span className="relative z-10">
+          <ScroggyCoin size={28} />
+        </span>
         <span className="relative z-10">Buy ScroggyCoins</span>
       </motion.button>
 
@@ -153,7 +156,14 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
             className="bg-casino-dark border-4 border-casino-gold rounded-2xl p-8 max-w-md w-full shadow-2xl"
           >
             <div className="text-center mb-6">
-              <div className="text-6xl mb-4">🪙</div>
+              <div className="flex justify-center mb-4">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                >
+                  <ScroggyCoin size={80} />
+                </motion.div>
+              </div>
               <h2 className="text-3xl font-bold text-white mb-2">Buy ScroggyCoins</h2>
               <p className="text-gray-300 text-sm">
                 Purchase in-game tokens with SOL!
