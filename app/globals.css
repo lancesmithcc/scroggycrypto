@@ -1,0 +1,469 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 15, 15, 30;
+  --background-end-rgb: 26, 26, 46;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: #0f0f1e;
+  background: linear-gradient(to bottom, rgb(10, 10, 20), rgb(20, 20, 35));
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Rainbow Fibonacci Spiral Containers - All Same Size, Different Speeds */
+
+/* 1. RED - Clockwise - Fastest */
+.spiral-container-1 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-1 60s linear infinite;
+}
+
+/* 2. ORANGE - Counter-clockwise */
+.spiral-container-2 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-2 70s linear infinite;
+}
+
+/* 3. YELLOW - Clockwise */
+.spiral-container-3 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-3 80s linear infinite;
+}
+
+/* 4. GREEN - Counter-clockwise */
+.spiral-container-4 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-4 90s linear infinite;
+}
+
+/* 5. BLUE - Clockwise */
+.spiral-container-5 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-5 100s linear infinite;
+}
+
+/* 6. INDIGO - Counter-clockwise */
+.spiral-container-6 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-6 110s linear infinite;
+}
+
+/* 7. VIOLET - Clockwise - Slowest */
+.spiral-container-7 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: spiral-rotate-7 120s linear infinite;
+}
+
+/* SVG Spiral Styling */
+.spiral-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Floating Stars and Moons */
+.star, .moon {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Individual Star Positions and Animations */
+.star-1 { top: 10%; left: 15%; animation: float-1 25s ease-in-out infinite; }
+.star-2 { top: 20%; left: 75%; animation: float-2 30s ease-in-out infinite; font-size: 1.5rem; }
+.star-3 { top: 35%; left: 85%; animation: float-3 28s ease-in-out infinite; }
+.star-4 { top: 45%; left: 10%; animation: float-4 32s ease-in-out infinite; font-size: 1.8rem; }
+.star-5 { top: 60%; left: 90%; animation: float-5 26s ease-in-out infinite; }
+.star-6 { top: 70%; left: 20%; animation: float-6 29s ease-in-out infinite; font-size: 1.6rem; }
+.star-7 { top: 80%; left: 80%; animation: float-7 31s ease-in-out infinite; }
+.star-8 { top: 15%; left: 50%; animation: float-8 27s ease-in-out infinite; font-size: 2.2rem; }
+.star-9 { top: 50%; left: 50%; animation: float-9 33s ease-in-out infinite; }
+.star-10 { top: 25%; left: 30%; animation: float-10 24s ease-in-out infinite; font-size: 1.4rem; }
+.star-11 { top: 65%; left: 60%; animation: float-11 35s ease-in-out infinite; }
+.star-12 { top: 85%; left: 40%; animation: float-12 28s ease-in-out infinite; font-size: 1.7rem; }
+
+/* Individual Moon Positions and Animations */
+.moon-1 { top: 5%; left: 25%; animation: drift-1 40s ease-in-out infinite; font-size: 3rem; opacity: 0.5; }
+.moon-2 { top: 30%; left: 70%; animation: drift-2 45s ease-in-out infinite; font-size: 2.5rem; opacity: 0.4; }
+.moon-3 { top: 55%; left: 15%; animation: drift-3 42s ease-in-out infinite; font-size: 2.8rem; opacity: 0.45; }
+.moon-4 { top: 75%; left: 85%; animation: drift-4 48s ease-in-out infinite; font-size: 3.2rem; opacity: 0.5; }
+.moon-5 { top: 12%; left: 90%; animation: drift-5 44s ease-in-out infinite; font-size: 2.6rem; opacity: 0.4; }
+.moon-6 { top: 40%; left: 5%; animation: drift-6 46s ease-in-out infinite; font-size: 2.9rem; opacity: 0.45; }
+.moon-7 { top: 68%; left: 50%; animation: drift-7 43s ease-in-out infinite; font-size: 3.1rem; opacity: 0.5; }
+.moon-8 { top: 88%; left: 65%; animation: drift-8 47s ease-in-out infinite; font-size: 2.7rem; opacity: 0.4; }
+
+/* Rainbow Spiral Rotations - Alternating Directions */
+
+/* 1. RED - Clockwise 60s */
+@keyframes spiral-rotate-1 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 2. ORANGE - Counter-clockwise 70s */
+@keyframes spiral-rotate-2 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* 3. YELLOW - Clockwise 80s */
+@keyframes spiral-rotate-3 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 4. GREEN - Counter-clockwise 90s */
+@keyframes spiral-rotate-4 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* 5. BLUE - Clockwise 100s */
+@keyframes spiral-rotate-5 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 6. INDIGO - Counter-clockwise 110s */
+@keyframes spiral-rotate-6 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+/* 7. VIOLET - Clockwise 120s */
+@keyframes spiral-rotate-7 {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Star Floating Animations - Gentle drift patterns */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(30px, -20px) rotate(5deg); }
+  50% { transform: translate(-20px, -40px) rotate(-5deg); }
+  75% { transform: translate(-30px, -20px) rotate(5deg); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 25px) scale(1.1); }
+  66% { transform: translate(25px, -15px) scale(0.9); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-40px, 30px) rotate(10deg); }
+}
+
+@keyframes float-4 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(20px, 20px); }
+  50% { transform: translate(40px, -10px); }
+  75% { transform: translate(10px, 30px); }
+}
+
+@keyframes float-5 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate(35px, -35px) rotate(-10deg) scale(1.15); }
+}
+
+@keyframes float-6 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-30px, -25px); }
+  66% { transform: translate(20px, 20px); }
+}
+
+@keyframes float-7 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-20px, 30px) rotate(8deg); }
+  50% { transform: translate(25px, 25px) rotate(-8deg); }
+  75% { transform: translate(30px, -20px) rotate(8deg); }
+}
+
+@keyframes float-8 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 40px) scale(1.2); }
+}
+
+@keyframes float-9 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(35px, -30px); }
+  50% { transform: translate(-25px, -35px); }
+  75% { transform: translate(-35px, 25px); }
+}
+
+@keyframes float-10 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(25px, -25px) rotate(12deg); }
+}
+
+@keyframes float-11 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-35px, 20px); }
+  66% { transform: translate(30px, -30px); }
+}
+
+@keyframes float-12 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, 35px) scale(1.1); }
+}
+
+/* Moon Drifting Animations - Slower, larger movements */
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(50px, -30px) rotate(5deg); }
+  50% { transform: translate(-30px, -60px) rotate(-5deg); }
+  75% { transform: translate(-50px, -30px) rotate(5deg); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-60px, 40px); }
+  66% { transform: translate(40px, -50px); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(45px, 35px) rotate(-8deg); }
+  50% { transform: translate(-35px, 50px) rotate(8deg); }
+  75% { transform: translate(55px, -40px) rotate(-8deg); }
+}
+
+@keyframes drift-4 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-55px, 45px); }
+}
+
+@keyframes drift-5 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-40px, -45px) rotate(6deg); }
+  50% { transform: translate(50px, -35px) rotate(-6deg); }
+  75% { transform: translate(35px, 40px) rotate(6deg); }
+}
+
+@keyframes drift-6 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(55px, -40px); }
+  66% { transform: translate(-45px, 50px); }
+}
+
+@keyframes drift-7 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(60px, -55px) rotate(10deg); }
+}
+
+@keyframes drift-8 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-50px, 35px); }
+  50% { transform: translate(40px, 55px); }
+  75% { transform: translate(50px, -45px); }
+}
+
+/* Pulsing glow effect for backgrounds */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.3;
+    filter: blur(40px);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(60px);
+  }
+}
+
+/* Slow rotation for decorative elements */
+@keyframes slow-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Ensure content is above animated background */
+#__next,
+[data-nextjs-scroll-focus-boundary] {
+  position: relative;
+  z-index: 1;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom casino-themed styles */
+.glow-gold {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8),
+               0 0 20px rgba(255, 215, 0, 0.6),
+               0 0 30px rgba(255, 215, 0, 0.4),
+               0 0 40px rgba(255, 215, 0, 0.2);
+}
+
+.glow-red {
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.8),
+               0 0 20px rgba(220, 20, 60, 0.6);
+}
+
+.casino-border {
+  border: 3px solid;
+  border-image: linear-gradient(45deg, #FFD700, #DC143C, #FFD700) 1;
+}
+
+/* Slot machine reel styles */
+.slot-reel {
+  transition: transform 0.1s ease-out;
+}
+
+.reel-blur {
+  filter: blur(2px);
+  opacity: 0.9;
+}
+
+@keyframes spin-reel {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+/* Reel spinning effect */
+@keyframes reel-spin {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-400px);
+  }
+}
+
+/* Win animation */
+@keyframes win-flash {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+    background-color: white;
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 1), inset 0 0 20px rgba(255, 215, 0, 0.3);
+    background-color: #fffef0;
+  }
+}
+
+.win-animation {
+  animation: win-flash 0.5s ease-in-out 4;
+}
+
+/* Reel stop bounce */
+@keyframes reel-stop {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Character speech bubble animations */
+@keyframes bubble-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.speech-bubble {
+  animation: bubble-pop 0.3s ease-out;
+}
+
+/* Character bounce */
+@keyframes character-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-5deg);
+  }
+}
+

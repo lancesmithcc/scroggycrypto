@@ -1,0 +1,24 @@
+[
+  {
+    "userId": "user_33sfeKIdxc3nBnbtGBDlef94RMk",
+    "username": "scroggy",
+    "balance": 26,
+    "totalWins": 7,
+    "totalLosses": 50,
+    "biggestWin": 50,
+    "gamesPlayed": 57,
+    "createdAt": "2025-10-10T15:40:02.172Z",
+    "lastPlayed": "2025-10-10T17:04:45.206Z"
+  },
+  {
+    "userId": "user_33shjI4Z2oK2edXzw7fd6DwqViF",
+    "username": "deej",
+    "balance": 8,
+    "totalWins": 0,
+    "totalLosses": 2,
+    "biggestWin": 0,
+    "gamesPlayed": 2,
+    "createdAt": "2025-10-10T15:57:01.542Z",
+    "lastPlayed": "2025-10-10T15:57:12.490Z"
+  }
+]
