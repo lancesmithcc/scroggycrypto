@@ -427,7 +427,7 @@ export default function GamePage() {
 
           {/* MOBILE: 3rd | DESKTOP: Right - Leaderboard */}
           <div className="lg:col-span-1 order-3">
-            <Leaderboard />
+            <Leaderboard onPurchaseComplete={fetchPlayerData} />
           </div>
         </div>
       </div>

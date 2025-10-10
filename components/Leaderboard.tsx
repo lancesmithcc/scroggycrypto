@@ -3,8 +3,13 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LeaderboardEntry } from '@/lib/types';
+import BuyTokens from './BuyTokens';
 
-export default function Leaderboard() {
+interface LeaderboardProps {
+  onPurchaseComplete?: () => void;
+}
+
+export default function Leaderboard({ onPurchaseComplete }: LeaderboardProps = {}) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -133,31 +138,37 @@ export default function Leaderboard() {
         </div>
       )}
 
-      <div className="mt-6 text-center">
-        <motion.button
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          whileHover={{ scale: isRefreshing ? 1 : 1.05 }}
-          whileTap={{ scale: isRefreshing ? 1 : 0.95 }}
-          className="text-sm font-semibold text-casino-gold hover:text-yellow-400 transition-colors px-4 py-2 rounded-lg border border-casino-gold/30 hover:border-casino-gold disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
-        >
-          <motion.div
-            className="absolute inset-0 bg-casino-gold/10"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: '100%' }}
-            transition={{ duration: 0.5 }}
-          />
-          <motion.span
-            animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
-            transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
-            className="inline-block mr-2"
+      <div className="mt-6 space-y-3">
+        {/* Refresh Button */}
+        <div className="text-center">
+          <motion.button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            whileHover={{ scale: isRefreshing ? 1 : 1.05 }}
+            whileTap={{ scale: isRefreshing ? 1 : 0.95 }}
+            className="text-sm font-semibold text-casino-gold hover:text-yellow-400 transition-colors px-4 py-2 rounded-lg border border-casino-gold/30 hover:border-casino-gold disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
           >
-            🔄
-          </motion.span>
-          <span className="relative z-10">
-            {isRefreshing ? 'Refreshing...' : 'Refresh Leaderboard'}
-          </span>
-        </motion.button>
+            <motion.div
+              className="absolute inset-0 bg-casino-gold/10"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.5 }}
+            />
+            <motion.span
+              animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
+              transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
+              className="inline-block mr-2"
+            >
+              🔄
+            </motion.span>
+            <span className="relative z-10">
+              {isRefreshing ? 'Refreshing...' : 'Refresh Leaderboard'}
+            </span>
+          </motion.button>
+        </div>
+
+        {/* Buy Tokens Button */}
+        <BuyTokens onPurchaseComplete={onPurchaseComplete || (() => {})} />
       </div>
     </div>
   );
