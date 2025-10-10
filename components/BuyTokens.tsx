@@ -166,7 +166,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
               </div>
               <h2 className="text-3xl font-bold text-white mb-2">Buy ScroggyCoins</h2>
               <p className="text-gray-300 text-sm">
-                Purchase in-game tokens with SOL!
+                Purchase in-game tokens with SOL! 100 ScroggyCoins = less than $1 at todays price. It doesn't take much to become a high rolling Scroggster. 
               </p>
             </div>
 
