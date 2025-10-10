@@ -1,7 +1,5 @@
 // Kokoro TTS Integration
-// Generates AI voice using your Kokoro API at kokoro.lancesmith.cc
-
-const KOKORO_API_BASE = 'https://kokoro.lancesmith.cc/api/v1';
+// Generates AI voice using your Kokoro API (proxied through /api/tts to avoid CORS)
 
 export interface KokoroVoiceOptions {
   text: string;
@@ -10,46 +8,42 @@ export interface KokoroVoiceOptions {
   model?: string;
 }
 
-// Generate voice audio using Kokoro API (client-side)
+// Generate voice audio using Kokoro API (via proxy to avoid CORS)
 export async function generateVoice(options: KokoroVoiceOptions): Promise<string | null> {
   try {
-    // Get API key from environment (must be NEXT_PUBLIC_ to work client-side)
-    const apiKey = process.env.NEXT_PUBLIC_KOKORO_API_KEY;
-    
-    if (!apiKey) {
-      console.warn('⚠️ NEXT_PUBLIC_KOKORO_API_KEY not set - voice will not play');
-      return null;
-    }
+    console.log('🎙️ Generating Kokoro voice via proxy:', options.text);
 
-    console.log('🎙️ Generating Kokoro voice:', options.text);
-
-    const response = await fetch(`${KOKORO_API_BASE}/audio/speech`, {
+    // Call our proxy API route instead of Kokoro directly (avoids CORS)
+    const response = await fetch('/api/tts', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: options.model || 'model_q8f16',
-        voice: options.voice || 'am_michael', // Default to Michael (tough voice)
-        input: options.text,
-        response_format: 'mp3',
+        text: options.text,
+        voice: options.voice || 'am_michael',
         speed: options.speed || 1,
+        model: options.model || 'model_q8f16',
       }),
     });
 
     if (!response.ok) {
-      console.error('❌ Kokoro TTS failed:', response.status, response.statusText);
-      const errorText = await response.text();
-      console.error('Error details:', errorText);
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('❌ TTS proxy failed:', response.status, errorData);
       return null;
     }
 
     // Convert response to blob and create object URL
     const blob = await response.blob();
+    
+    if (blob.size === 0) {
+      console.error('❌ Received empty audio blob');
+      return null;
+    }
+    
     const audioUrl = URL.createObjectURL(blob);
     
-    console.log('✅ Kokoro voice generated successfully');
+    console.log('✅ Kokoro voice generated successfully, size:', blob.size, 'bytes');
     return audioUrl;
   } catch (error) {
     console.error('❌ Error generating voice:', error);
@@ -60,29 +54,57 @@ export async function generateVoice(options: KokoroVoiceOptions): Promise<string
 // Client-side voice player
 export async function playVoice(text: string, voice: string = 'am_michael', speed: number = 1): Promise<void> {
   try {
+    console.log('🎙️ Attempting to play voice:', text);
     const audioUrl = await generateVoice({ text, voice, speed });
     
     if (!audioUrl) {
-      console.warn('Failed to generate voice, skipping audio');
+      console.warn('⚠️ Failed to generate voice, skipping audio');
       return;
     }
 
+    console.log('🔊 Audio URL generated, creating Audio element...');
     const audio = new Audio(audioUrl);
+    audio.volume = 0.8; // Set volume to 80%
     
     return new Promise((resolve, reject) => {
+      audio.onloadeddata = () => {
+        console.log('✅ Audio loaded, duration:', audio.duration, 'seconds');
+      };
+      
       audio.onended = () => {
+        console.log('✅ Audio playback completed');
         URL.revokeObjectURL(audioUrl); // Clean up
         resolve();
       };
+      
       audio.onerror = (err) => {
-        console.error('Audio playback error:', err);
+        console.error('❌ Audio playback error:', err);
+        console.error('Audio error details:', audio.error);
         URL.revokeObjectURL(audioUrl);
         reject(err);
       };
-      audio.play().catch(reject);
+      
+      // Try to play with detailed error handling
+      audio.play()
+        .then(() => {
+          console.log('▶️ Audio playing...');
+        })
+        .catch((err) => {
+          console.error('❌ Failed to play audio:', err);
+          console.error('Error name:', err.name);
+          console.error('Error message:', err.message);
+          
+          // Provide helpful error message
+          if (err.name === 'NotAllowedError') {
+            console.warn('⚠️ Audio blocked by browser - user interaction may be required');
+          }
+          
+          URL.revokeObjectURL(audioUrl);
+          reject(err);
+        });
     });
   } catch (error) {
-    console.error('Error playing voice:', error);
+    console.error('❌ Error in playVoice:', error);
   }
 }
 

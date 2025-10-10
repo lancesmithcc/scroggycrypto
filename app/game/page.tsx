@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SlotMachine from '@/components/SlotMachine';
 import Leaderboard from '@/components/Leaderboard';
 import PayoutTable from '@/components/PayoutTable';
+import SolanaDonate from '@/components/SolanaDonate';
 import { Player } from '@/lib/types';
 import { getCachedPlayer, cachePlayerData } from '@/lib/clientStorage';
 import { playVoice, getRandomThreat } from '@/lib/kokoroTTS';
@@ -408,6 +409,9 @@ export default function GamePage() {
       <footer className="max-w-7xl mx-auto mt-8 text-center text-sm text-gray-500">
         <p>Powered by Blockchain Based ScroggyCoin utility tokens • For entertainment only • No real monetary value</p>
       </footer>
+
+      {/* Solana Donation Button */}
+      <SolanaDonate />
     </div>
   );
 }
