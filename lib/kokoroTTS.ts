@@ -2,7 +2,6 @@
 // Generates AI voice using your Kokoro API at kokoro.lancesmith.cc
 
 const KOKORO_API_BASE = 'https://kokoro.lancesmith.cc/api/v1';
-const KOKORO_API_KEY = process.env.NEXT_PUBLIC_KOKORO_API_KEY || '';
 
 export interface KokoroVoiceOptions {
   text: string;
@@ -11,13 +10,23 @@ export interface KokoroVoiceOptions {
   model?: string;
 }
 
-// Generate voice audio using Kokoro API
+// Generate voice audio using Kokoro API (client-side)
 export async function generateVoice(options: KokoroVoiceOptions): Promise<string | null> {
   try {
+    // Get API key from environment (must be NEXT_PUBLIC_ to work client-side)
+    const apiKey = process.env.NEXT_PUBLIC_KOKORO_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('⚠️ NEXT_PUBLIC_KOKORO_API_KEY not set - voice will not play');
+      return null;
+    }
+
+    console.log('🎙️ Generating Kokoro voice:', options.text);
+
     const response = await fetch(`${KOKORO_API_BASE}/audio/speech`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${KOKORO_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -30,7 +39,9 @@ export async function generateVoice(options: KokoroVoiceOptions): Promise<string
     });
 
     if (!response.ok) {
-      console.error('Kokoro TTS failed:', response.status, response.statusText);
+      console.error('❌ Kokoro TTS failed:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error details:', errorText);
       return null;
     }
 
@@ -38,9 +49,10 @@ export async function generateVoice(options: KokoroVoiceOptions): Promise<string
     const blob = await response.blob();
     const audioUrl = URL.createObjectURL(blob);
     
+    console.log('✅ Kokoro voice generated successfully');
     return audioUrl;
   } catch (error) {
-    console.error('Error generating voice:', error);
+    console.error('❌ Error generating voice:', error);
     return null;
   }
 }

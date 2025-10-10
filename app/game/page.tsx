@@ -232,76 +232,130 @@ export default function GamePage() {
             />
             
             {player.balance < 1 && (
-              <div className="mt-6 bg-casino-red/20 border-2 border-casino-red rounded-xl p-6 text-center space-y-4 relative overflow-hidden">
-                {/* Threatening Character with Voice */}
+              <>
+                {/* Threatening Character with Voice - Bottom Right like Slot Comments */}
                 <AnimatePresence>
                   {threat && (
                     <motion.div
-                      initial={{ x: 300, opacity: 0, scale: 0.5 }}
-                      animate={{ x: 0, opacity: 1, scale: 1 }}
-                      exit={{ x: 300, opacity: 0, scale: 0.5 }}
-                      transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-                      className="absolute -top-4 -right-4 bg-black/90 border-2 border-red-500 rounded-2xl p-4 shadow-2xl z-20 max-w-xs"
+                      initial={{ x: 200, y: 200, opacity: 0, scale: 0.5 }}
+                      animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                      exit={{ x: 200, y: 200, opacity: 0, scale: 0.5 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 200, 
+                        damping: 20,
+                        duration: 0.5
+                      }}
+                      className="fixed bottom-8 right-8 z-50 flex items-end gap-4"
                     >
+                      {/* Speech Bubble - LARGER */}
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="relative bg-white text-casino-dark rounded-2xl px-8 py-6 shadow-2xl max-w-md"
+                      >
+                        {/* Speech bubble pointer */}
+                        <div className="absolute bottom-6 -right-4 w-0 h-0 border-t-[20px] border-t-transparent border-l-[25px] border-l-white border-b-[20px] border-b-transparent"></div>
+                        
+                        <p className="text-2xl font-bold italic leading-tight">
+                          "{threat.text}"
+                        </p>
+                        
+                        {/* Voice waveform animation */}
+                        {isPlayingVoice && (
+                          <div className="flex gap-2 mt-4 justify-center">
+                            <motion.div 
+                              animate={{ height: ['6px', '20px', '6px'] }} 
+                              transition={{ duration: 0.4, repeat: Infinity }} 
+                              className="w-2 bg-red-500 rounded"
+                            />
+                            <motion.div 
+                              animate={{ height: ['6px', '20px', '6px'] }} 
+                              transition={{ duration: 0.4, repeat: Infinity, delay: 0.1 }} 
+                              className="w-2 bg-red-500 rounded"
+                            />
+                            <motion.div 
+                              animate={{ height: ['6px', '20px', '6px'] }} 
+                              transition={{ duration: 0.4, repeat: Infinity, delay: 0.2 }} 
+                              className="w-2 bg-red-500 rounded"
+                            />
+                            <motion.div 
+                              animate={{ height: ['6px', '20px', '6px'] }} 
+                              transition={{ duration: 0.4, repeat: Infinity, delay: 0.15 }} 
+                              className="w-2 bg-red-500 rounded"
+                            />
+                          </div>
+                        )}
+                      </motion.div>
+
+                      {/* Character - BIGGER */}
                       <motion.div
                         animate={{ 
-                          rotate: [0, -5, 5, -5, 0],
-                          scale: isPlayingVoice ? [1, 1.05, 1, 1.05, 1] : 1
+                          y: [0, -15, 0],
+                          rotate: [0, 8, -8, 0],
+                          scale: isPlayingVoice ? [1, 1.1, 1] : 1
                         }}
-                        transition={{ duration: 0.5, repeat: isPlayingVoice ? Infinity : 0 }}
-                        className="text-7xl mb-2"
+                        transition={{ 
+                          y: {
+                            duration: 1.2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          },
+                          rotate: {
+                            duration: 0.6,
+                            repeat: Infinity,
+                            repeatDelay: 1,
+                            ease: "easeInOut"
+                          },
+                          scale: {
+                            duration: 0.4,
+                            repeat: isPlayingVoice ? Infinity : 0
+                          }
+                        }}
+                        className="text-9xl drop-shadow-2xl"
                       >
                         {threat.character}
                       </motion.div>
-                      <div className="bg-white text-black rounded-xl p-3 relative">
-                        <div className="absolute -top-2 right-8 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-white"></div>
-                        <p className="text-sm font-bold leading-tight">
-                          {threat.text}
-                        </p>
-                        {isPlayingVoice && (
-                          <div className="flex gap-1 mt-2 justify-center">
-                            <motion.div animate={{ height: ['4px', '12px', '4px'] }} transition={{ duration: 0.5, repeat: Infinity }} className="w-1 bg-red-500 rounded"></motion.div>
-                            <motion.div animate={{ height: ['4px', '12px', '4px'] }} transition={{ duration: 0.5, repeat: Infinity, delay: 0.1 }} className="w-1 bg-red-500 rounded"></motion.div>
-                            <motion.div animate={{ height: ['4px', '12px', '4px'] }} transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }} className="w-1 bg-red-500 rounded"></motion.div>
-                          </div>
-                        )}
-                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <div className="flex items-center justify-center gap-3">
-                  <span className="text-5xl">💀</span>
-                  <div>
-                    <p className="text-casino-red font-bold text-2xl">
-                      Out of Tokens!
-                    </p>
-                    <p className="text-gray-300 text-sm mt-1">
-                      Your ScroggyCoins have vanished into the void
-                    </p>
+                {/* Out of Tokens Panel */}
+                <div className="mt-6 bg-casino-red/20 border-2 border-casino-red rounded-xl p-6 text-center space-y-4">
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-5xl">💀</span>
+                    <div>
+                      <p className="text-casino-red font-bold text-2xl">
+                        Out of Tokens!
+                      </p>
+                      <p className="text-gray-300 text-sm mt-1">
+                        Your ScroggyCoins have vanished into the void
+                      </p>
+                    </div>
+                    <span className="text-5xl">😈</span>
                   </div>
-                  <span className="text-5xl">😈</span>
+                  
+                  <motion.button
+                    onClick={handleRestart}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-gradient-to-r from-casino-gold to-yellow-500 text-casino-dark px-8 py-4 rounded-xl text-lg font-bold transform transition-all duration-200 shadow-lg hover:shadow-casino-gold/50 relative overflow-hidden group"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-white/20"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: '100%' }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <span className="relative z-10">🧙‍♂️ Start Fresh (10 Tokens)</span>
+                  </motion.button>
+                  
+                  <p className="text-xs text-gray-500 italic">
+                    Scroggy the Wizard grants you another chance!
+                  </p>
                 </div>
-                
-                <motion.button
-                  onClick={handleRestart}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-casino-gold to-yellow-500 text-casino-dark px-8 py-4 rounded-xl text-lg font-bold transform transition-all duration-200 shadow-lg hover:shadow-casino-gold/50 relative overflow-hidden group"
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-white/20"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.5 }}
-                  />
-                  <span className="relative z-10">🧙‍♂️ Start Fresh (10 Tokens)</span>
-                </motion.button>
-                
-                <p className="text-xs text-gray-500 italic">
-                  Scroggy the Wizard grants you another chance!
-                </p>
-              </div>
+              </>
             )}
           </div>
 
