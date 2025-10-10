@@ -8,6 +8,7 @@ import SlotMachine from '@/components/SlotMachine';
 import Leaderboard from '@/components/Leaderboard';
 import PayoutTable from '@/components/PayoutTable';
 import { Player } from '@/lib/types';
+import { getCachedPlayer, cachePlayerData } from '@/lib/clientStorage';
 
 export default function GamePage() {
   const { user } = useUser();
@@ -16,15 +17,31 @@ export default function GamePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPlayerData();
-  }, []);
+    if (user) {
+      fetchPlayerData();
+    }
+  }, [user]);
 
   const fetchPlayerData = async () => {
     try {
+      // Try to load from cache first for instant display
+      if (user) {
+        const cached = getCachedPlayer(user.id);
+        if (cached) {
+          setPlayer(cached);
+          setLoading(false);
+          // Continue to fetch from API in background to sync
+        }
+      }
+
       const response = await fetch('/api/player');
       if (response.ok) {
         const data = await response.json();
         setPlayer(data);
+        // Cache the fresh data
+        if (user) {
+          cachePlayerData(data);
+        }
       } else {
         setError('Failed to load player data');
       }
@@ -37,7 +54,17 @@ export default function GamePage() {
   };
 
   const handleSpin = async (betAmount: number) => {
+    if (!player) return;
+    
     try {
+      // OPTIMISTIC UPDATE: Update balance immediately on client-side
+      const optimisticBalance = player.balance - betAmount;
+      setPlayer({
+        ...player,
+        balance: optimisticBalance,
+      });
+
+      // Make API call to GitHub (slow, but persistent)
       const response = await fetch('/api/spin', {
         method: 'POST',
         headers: {
@@ -47,16 +74,30 @@ export default function GamePage() {
       });
 
       if (!response.ok) {
+        // ROLLBACK on error
+        setPlayer({
+          ...player,
+          balance: player.balance,
+        });
         const error = await response.json();
         throw new Error(error.error || 'Spin failed');
       }
 
       const data = await response.json();
+      
+      // Update with actual data from server (includes win/loss calculations)
       setPlayer(data.player);
+      
+      // Cache the updated player data
+      if (user) {
+        cachePlayerData(data.player);
+      }
 
       return data.result;
     } catch (err) {
       console.error('Spin error:', err);
+      // Try to fetch fresh data on error
+      fetchPlayerData();
       throw err;
     }
   };
@@ -73,6 +114,10 @@ export default function GamePage() {
       if (response.ok) {
         const data = await response.json();
         setPlayer(data);
+        // Cache the restarted player data
+        if (user) {
+          cachePlayerData(data);
+        }
       }
     } catch (err) {
       console.error('Restart error:', err);

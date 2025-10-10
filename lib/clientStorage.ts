@@ -1,10 +1,11 @@
 // Client-side storage utilities for Netlify deployment
-// Uses localStorage as a fallback when serverless functions can't write to files
+// Uses localStorage for instant UI updates, syncs with GitHub in background
 
 import { Player, INITIAL_BALANCE } from './types';
 
 const PLAYERS_KEY = 'scroggy_players';
 const CURRENT_USER_KEY = 'scroggy_current_user';
+const LAST_SYNC_KEY = 'scroggy_last_sync';
 
 export function isLocalStorageAvailable(): boolean {
   try {
@@ -93,5 +94,30 @@ export function getLeaderboardLocal(): Player[] {
 // Reset player tokens
 export function resetPlayerTokensLocal(userId: string): Player | null {
   return updatePlayerLocal(userId, { balance: INITIAL_BALANCE });
+}
+
+// Cache player data from API response
+export function cachePlayerData(player: Player): void {
+  if (!isLocalStorageAvailable()) return;
+  
+  const players = getAllPlayersLocal();
+  const playerIndex = players.findIndex(p => p.userId === player.userId);
+  
+  if (playerIndex >= 0) {
+    players[playerIndex] = player;
+  } else {
+    players.push(player);
+  }
+  
+  saveAllPlayersLocal(players);
+  localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+}
+
+// Get cached player or null
+export function getCachedPlayer(userId: string): Player | null {
+  if (!isLocalStorageAvailable()) return null;
+  
+  const players = getAllPlayersLocal();
+  return players.find(p => p.userId === userId) || null;
 }
 

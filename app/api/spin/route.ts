@@ -15,6 +15,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log(`[SPIN] User ${userId} spinning...`);
+
     const { betAmount } = await request.json();
 
     if (!betAmount || typeof betAmount !== 'number') {
@@ -25,8 +27,17 @@ export async function POST(request: Request) {
     const player = await getCurrentPlayerFromGitHub(userId);
 
     if (!player) {
+      console.error(`[SPIN] Player not found for userId: ${userId}`);
       return NextResponse.json({ error: 'Player not found' }, { status: 404 });
     }
+
+    // Verify player userId matches request userId (prevent mixups)
+    if (player.userId !== userId) {
+      console.error(`[SPIN] UserId mismatch! Expected: ${userId}, Got: ${player.userId}`);
+      return NextResponse.json({ error: 'User verification failed' }, { status: 403 });
+    }
+
+    console.log(`[SPIN] User ${userId} balance before: ${player.balance}`);
 
     // Validate bet
     const validation = validateBet(betAmount, player.balance, MIN_BET, MAX_BET);
@@ -50,11 +61,27 @@ export async function POST(request: Request) {
       gamesPlayed: player.gamesPlayed + 1,
     };
 
-    // Update player on GitHub
-    const updatedPlayer = await updatePlayerOnGitHub(userId, updates);
+    // Update player on GitHub (with retry logic)
+    let updatedPlayer = await updatePlayerOnGitHub(userId, updates);
+    
+    // Retry once if it fails (handles GitHub API rate limits/conflicts)
+    if (!updatedPlayer) {
+      console.warn(`[SPIN] First update failed, retrying for user ${userId}...`);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+      updatedPlayer = await updatePlayerOnGitHub(userId, updates);
+    }
 
     if (!updatedPlayer) {
+      console.error(`[SPIN] Failed to update player ${userId} after retry`);
       return NextResponse.json({ error: 'Failed to update player' }, { status: 500 });
+    }
+
+    console.log(`[SPIN] User ${userId} balance after: ${updatedPlayer.balance}`);
+
+    // Double-check the returned player matches the request user
+    if (updatedPlayer.userId !== userId) {
+      console.error(`[SPIN] CRITICAL: Updated player userId mismatch! Expected: ${userId}, Got: ${updatedPlayer.userId}`);
+      return NextResponse.json({ error: 'Data integrity error' }, { status: 500 });
     }
 
     // Return spin result
@@ -64,7 +91,7 @@ export async function POST(request: Request) {
       player: updatedPlayer,
     });
   } catch (error) {
-    console.error('Error processing spin:', error);
+    console.error('[SPIN] Error processing spin:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
