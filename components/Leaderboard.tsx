@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LeaderboardEntry } from '@/lib/types';
 import BuyTokens from './BuyTokens';
+import { getSoundGenerator } from '@/lib/soundUtils';
 
 interface LeaderboardProps {
   onPurchaseComplete?: () => void;
@@ -13,6 +14,7 @@ export default function Leaderboard({ onPurchaseComplete }: LeaderboardProps = {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const soundGenerator = useMemo(() => (typeof window !== 'undefined' ? getSoundGenerator() : null), []);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -37,29 +39,8 @@ export default function Leaderboard({ onPurchaseComplete }: LeaderboardProps = {
     
     setIsRefreshing(true);
     
-    // Play refresh sound
-    if (typeof window !== 'undefined') {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
-      // Ascending tone sequence for refresh
-      [600, 700, 800].forEach((freq, i) => {
-        setTimeout(() => {
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          
-          oscillator.type = 'sine';
-          oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-          
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          
-          oscillator.start();
-          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-          oscillator.stop(audioContext.currentTime + 0.1);
-        }, i * 80);
-      });
-    }
+    await soundGenerator?.unlock();
+    soundGenerator?.playRefreshSound();
     
     await fetchLeaderboard();
     
@@ -173,4 +154,3 @@ export default function Leaderboard({ onPurchaseComplete }: LeaderboardProps = {
     </div>
   );
 }
-

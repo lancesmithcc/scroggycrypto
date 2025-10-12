@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ import SolanaDonate from '@/components/SolanaDonate';
 import { Player } from '@/lib/types';
 import { getCachedPlayer, cachePlayerData } from '@/lib/clientStorage';
 import { playVoice, getRandomThreat } from '@/lib/kokoroTTS';
+import { getSoundGenerator } from '@/lib/soundUtils';
 
 export default function GamePage() {
   const { user } = useUser();
@@ -21,6 +22,7 @@ export default function GamePage() {
   const [threat, setThreat] = useState<{ text: string; character: string; voice: string } | null>(null);
   const [isPlayingVoice, setIsPlayingVoice] = useState(false);
   const [hasPlayedWelcome, setHasPlayedWelcome] = useState(false);
+  const soundGenerator = useMemo(() => (typeof window !== 'undefined' ? getSoundGenerator() : null), []);
 
   useEffect(() => {
     if (user) {
@@ -84,6 +86,8 @@ export default function GamePage() {
     if (!player) return;
     
     try {
+      await soundGenerator?.unlock();
+
       // Play welcome.mp3 on first spin!
       if (!hasPlayedWelcome) {
         console.log('🎵 Playing welcome audio...');
@@ -157,24 +161,8 @@ export default function GamePage() {
 
   const handleRestart = async () => {
     try {
-      // Play click sound
-      if (typeof window !== 'undefined') {
-        const audio = new Audio();
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-        oscillator.stop(audioContext.currentTime + 0.1);
-      }
+      await soundGenerator?.unlock();
+      soundGenerator?.playRestartSound();
 
       const response = await fetch('/api/player/restart', {
         method: 'POST',
@@ -210,12 +198,17 @@ export default function GamePage() {
   }
 
   if (error || !player) {
+    const handleRetry = () => {
+      soundGenerator?.playRefreshSound();
+      fetchPlayerData();
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center bg-casino-dark border-2 border-casino-red rounded-2xl p-8">
           <p className="text-xl text-casino-red mb-4">{error || 'Failed to load game'}</p>
           <button
-            onClick={fetchPlayerData}
+            onClick={handleRetry}
             className="bg-casino-gold text-casino-dark px-6 py-2 rounded-lg font-bold hover:bg-yellow-400"
           >
             Try Again
@@ -231,7 +224,10 @@ export default function GamePage() {
       <header className="max-w-7xl mx-auto mb-4 md:mb-8">
         <div className="flex items-center justify-between p-2 md:p-4">
           <Link href="/">
-            <div className="flex items-center gap-1 md:gap-2 cursor-pointer hover:scale-105 transition-transform">
+            <div
+              className="flex items-center gap-1 md:gap-2 cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => soundGenerator?.playClickSound()}
+            >
               <span className="text-4xl md:text-6xl lg:text-8xl">🧙‍♂️</span>
               <h1 className="text-2xl md:text-5xl lg:text-6xl font-extrabold text-casino-gold glow-gold">
                 SCROGGY'S CASINO
@@ -444,4 +440,3 @@ export default function GamePage() {
     </div>
   );
 }
-

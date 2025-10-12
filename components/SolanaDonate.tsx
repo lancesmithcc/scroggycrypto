@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { getSoundGenerator } from '@/lib/soundUtils';
 
 export default function SolanaDonate() {
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState('0.1');
   const [status, setStatus] = useState<string>('');
   const [isDonating, setIsDonating] = useState(false);
+  const soundGenerator = useMemo(() => (typeof window !== 'undefined' ? getSoundGenerator() : null), []);
 
   const CASINO_WALLET = process.env.NEXT_PUBLIC_SOLANA_ADDRESS || '';
 
@@ -21,6 +23,19 @@ export default function SolanaDonate() {
     }
   }
 
+  const openModal = async () => {
+    await soundGenerator?.unlock();
+    soundGenerator?.playModalOpenSound();
+    setStatus('');
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setStatus('');
+    soundGenerator?.playModalCloseSound();
+  };
+
   const handleDonate = async () => {
     if (!window.solana || !window.solana.isPhantom) {
       setStatus('❌ Phantom Wallet not found! Please install it from phantom.app');
@@ -28,6 +43,9 @@ export default function SolanaDonate() {
     }
 
     try {
+      await soundGenerator?.unlock();
+      soundGenerator?.playClickSound();
+
       setIsDonating(true);
       setStatus('🔗 Connecting to Phantom...');
 
@@ -65,37 +83,19 @@ export default function SolanaDonate() {
 
       // Sign and send transaction
       const signed = await window.solana.signAndSendTransaction(transaction);
-      
+
       console.log('Transaction signature:', signed.signature);
       setStatus(`✅ Thank you! Donation sent: ${signed.signature.substring(0, 20)}...`);
-      
-      // Play success sound
-      if (typeof window !== 'undefined') {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        [523, 659, 784, 1047].forEach((freq, i) => {
-          setTimeout(() => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-            oscillator.stop(audioContext.currentTime + 0.3);
-          }, i * 100);
-        });
-      }
+      soundGenerator?.playSuccessSound();
 
       setTimeout(() => {
-        setIsOpen(false);
-        setStatus('');
+        closeModal();
       }, 5000);
 
     } catch (error: any) {
       console.error('Donation error:', error);
       setStatus(`❌ ${error.message || 'Transaction failed'}`);
+      soundGenerator?.playErrorSound();
     } finally {
       setIsDonating(false);
     }
@@ -105,7 +105,7 @@ export default function SolanaDonate() {
     <>
       {/* Bottom Donate Button */}
       <motion.button
-        onClick={() => setIsOpen(true)}
+        onClick={openModal}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-4 rounded-xl font-bold shadow-2xl hover:shadow-purple-500/50 transition-all flex items-center justify-center gap-3 border-2 border-purple-400"
@@ -139,7 +139,19 @@ export default function SolanaDonate() {
                 <input
                   type="number"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    const current = parseFloat(amount) || 0;
+                    const next = parseFloat(newValue) || 0;
+                    if (next > current) {
+                      soundGenerator?.playAdjustUpSound();
+                    } else if (next < current) {
+                      soundGenerator?.playAdjustDownSound();
+                    } else {
+                      soundGenerator?.playClickSound();
+                    }
+                    setAmount(newValue);
+                  }}
                   step="0.01"
                   min="0.01"
                   className="w-full bg-casino-darker border-2 border-purple-500/30 rounded-lg px-4 py-3 text-white text-xl font-bold focus:border-purple-500 focus:outline-none"
@@ -149,7 +161,18 @@ export default function SolanaDonate() {
                   {['0.1', '0.5', '1.0'].map((amt) => (
                     <button
                       key={amt}
-                      onClick={() => setAmount(amt)}
+                      onClick={() => {
+                        const current = parseFloat(amount) || 0;
+                        const next = parseFloat(amt);
+                        if (next > current) {
+                          soundGenerator?.playAdjustUpSound();
+                        } else if (next < current) {
+                          soundGenerator?.playAdjustDownSound();
+                        } else {
+                          soundGenerator?.playClickSound();
+                        }
+                        setAmount(amt);
+                      }}
                       className="flex-1 bg-casino-darker hover:bg-purple-600/30 border border-purple-500/30 hover:border-purple-500 rounded-lg py-2 text-sm text-white transition-all"
                       disabled={isDonating}
                     >
@@ -206,8 +229,8 @@ export default function SolanaDonate() {
                 
                 <motion.button
                   onClick={() => {
-                    setIsOpen(false);
-                    setStatus('');
+                    if (isDonating) return;
+                    closeModal();
                   }}
                   disabled={isDonating}
                   whileHover={{ scale: 1.02 }}
@@ -242,4 +265,3 @@ export default function SolanaDonate() {
     </>
   );
 }
-

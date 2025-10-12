@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SLOT_SYMBOLS } from '@/lib/types';
-import { getSoundGenerator } from '@/lib/soundUtils';
+import SoundGenerator, { getSoundGenerator } from '@/lib/soundUtils';
 import { getRandomLossComment, getRandomWinComment, type CharacterComment } from '@/lib/characterComments';
 
 interface SlotMachineProps {
@@ -28,7 +28,7 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
   } | null>(null);
   const [showWinAnimation, setShowWinAnimation] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [soundGenerator, setSoundGenerator] = useState<any>(null);
+  const [soundGenerator, setSoundGenerator] = useState<SoundGenerator | null>(null);
   const [characterComment, setCharacterComment] = useState<CharacterComment | null>(null);
   const [reelSymbols, setReelSymbols] = useState<string[][]>([
     [...SLOT_SYMBOLS],
@@ -37,23 +37,52 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
   ]);
 
   useEffect(() => {
-    // Initialize sound generator on client side only
-    if (typeof window !== 'undefined') {
-      const generator = getSoundGenerator();
-      setSoundGenerator(generator);
-    }
+    if (typeof window === 'undefined') return;
+
+    const generator = getSoundGenerator();
+    setSoundGenerator(generator);
+
+    const unlockOnInteraction = () => {
+      generator.unlock().catch(() => {});
+    };
+
+    window.addEventListener('pointerdown', unlockOnInteraction, { once: true });
+    window.addEventListener('touchstart', unlockOnInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', unlockOnInteraction);
+      window.removeEventListener('touchstart', unlockOnInteraction);
+    };
   }, []);
 
-  const toggleSound = () => {
+  const toggleSound = async () => {
+    if (!soundGenerator) {
+      setSoundEnabled(prev => !prev);
+      return;
+    }
+
     const newState = !soundEnabled;
     setSoundEnabled(newState);
-    if (soundGenerator) {
-      soundGenerator.setEnabled(newState);
+    // Ensure the generator knows about new state
+    soundGenerator.setEnabled(true);
+
+    if (newState) {
+      await soundGenerator.unlock();
+      soundGenerator.playToggleSound(true);
+    } else {
+      soundGenerator.playToggleSound(false);
     }
+
+    soundGenerator.setEnabled(newState);
   };
 
   const handleSpin = async () => {
     if (spinning || disabled || betAmount > balance) return;
+
+    if (soundGenerator) {
+      await soundGenerator.unlock();
+      soundGenerator.playClickSound();
+    }
 
     setSpinning(true);
     setSpinningReels([true, true, true]);
@@ -66,7 +95,7 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
     }
 
     // Animate each reel independently by cycling through symbols
-    const reelIntervals: NodeJS.Timeout[] = [];
+    const reelIntervals: ReturnType<typeof setInterval>[] = [];
     
     // Start all reels spinning - cycle through random symbols
     for (let i = 0; i < 3; i++) {
@@ -157,20 +186,25 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
       reelIntervals.forEach(interval => clearInterval(interval));
       setSpinning(false);
       setSpinningReels([false, false, false]);
+      soundGenerator?.playErrorSound();
     }
   };
 
   const increaseBet = () => {
     if (betAmount < 10 && betAmount < balance) {
       setBetAmount(betAmount + 1);
-      if (soundGenerator && soundEnabled) soundGenerator.playClickSound();
+      if (soundGenerator && soundEnabled) {
+        soundGenerator.playAdjustUpSound();
+      }
     }
   };
 
   const decreaseBet = () => {
     if (betAmount > 1) {
       setBetAmount(betAmount - 1);
-      if (soundGenerator && soundEnabled) soundGenerator.playClickSound();
+      if (soundGenerator && soundEnabled) {
+        soundGenerator.playAdjustDownSound();
+      }
     }
   };
 
@@ -415,4 +449,3 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
     </div>
   );
 }
-

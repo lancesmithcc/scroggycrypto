@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import ScroggyCoin from './ScroggyCoin';
+import { getSoundGenerator } from '@/lib/soundUtils';
 
 interface BuyTokensProps {
   onPurchaseComplete: () => void;
@@ -13,6 +14,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [status, setStatus] = useState<string>('');
   const [tokenAmount, setTokenAmount] = useState(100);
+  const soundGenerator = useMemo(() => (typeof window !== 'undefined' ? getSoundGenerator() : null), []);
 
   const CASINO_WALLET = process.env.NEXT_PUBLIC_SOLANA_ADDRESS || '';
   const PRICE_PER_100_TOKENS = 0.005; // 0.005 SOL = 100 ScroggyCoins
@@ -23,6 +25,18 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
   };
   
   const solCost = calculateCost(tokenAmount);
+  const openModal = async () => {
+    await soundGenerator?.unlock();
+    soundGenerator?.playModalOpenSound();
+    setStatus('');
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setStatus('');
+    soundGenerator?.playModalCloseSound();
+  };
 
   const handlePurchase = async () => {
     if (!window.solana || !window.solana.isPhantom) {
@@ -36,6 +50,9 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
     }
 
     try {
+      await soundGenerator?.unlock();
+      soundGenerator?.playClickSound();
+
       setIsPurchasing(true);
       setStatus('🔗 Connecting to Phantom...');
 
@@ -90,37 +107,19 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
       const result = await response.json();
       
       setStatus(`✅ Success! You now have ${result.newBalance} ScroggyCoins!`);
-      
-      // Play success sound
-      if (typeof window !== 'undefined') {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        [523, 659, 784, 1047].forEach((freq, i) => {
-          setTimeout(() => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-            oscillator.stop(audioContext.currentTime + 0.3);
-          }, i * 100);
-        });
-      }
+      soundGenerator?.playSuccessSound();
 
       // Notify parent to refresh player data
       onPurchaseComplete();
 
       setTimeout(() => {
-        setIsOpen(false);
-        setStatus('');
+        closeModal();
       }, 3000);
 
     } catch (error: any) {
       console.error('Purchase error:', error);
       setStatus(`❌ ${error.message || 'Purchase failed'}`);
+      soundGenerator?.playErrorSound();
     } finally {
       setIsPurchasing(false);
     }
@@ -130,7 +129,7 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
     <>
       {/* Buy Tokens Button */}
       <motion.button
-        onClick={() => setIsOpen(true)}
+        onClick={openModal}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="text-sm font-semibold bg-gradient-to-r from-casino-gold to-yellow-500 text-casino-dark px-6 py-3 rounded-lg hover:from-yellow-500 hover:to-casino-gold transition-all shadow-lg hover:shadow-casino-gold/50 flex items-center justify-center gap-2 w-full relative overflow-hidden group"
@@ -179,7 +178,17 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
                 <input
                   type="number"
                   value={tokenAmount}
-                  onChange={(e) => setTokenAmount(Math.max(10, parseInt(e.target.value) || 100))}
+                  onChange={(e) => {
+                    const nextValue = Math.max(10, parseInt(e.target.value) || 100);
+                    if (nextValue > tokenAmount) {
+                      soundGenerator?.playAdjustUpSound();
+                    } else if (nextValue < tokenAmount) {
+                      soundGenerator?.playAdjustDownSound();
+                    } else {
+                      soundGenerator?.playClickSound();
+                    }
+                    setTokenAmount(nextValue);
+                  }}
                   step="10"
                   min="10"
                   className="w-full bg-casino-darker border-2 border-casino-gold/30 rounded-lg px-4 py-3 text-white text-xl font-bold focus:border-casino-gold focus:outline-none"
@@ -195,7 +204,16 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
                   ].map((pkg) => (
                     <button
                       key={pkg.tokens}
-                      onClick={() => setTokenAmount(pkg.tokens)}
+                      onClick={() => {
+                        if (pkg.tokens > tokenAmount) {
+                          soundGenerator?.playAdjustUpSound();
+                        } else if (pkg.tokens < tokenAmount) {
+                          soundGenerator?.playAdjustDownSound();
+                        } else {
+                          soundGenerator?.playClickSound();
+                        }
+                        setTokenAmount(pkg.tokens);
+                      }}
                       className={`py-2 px-1 rounded-lg text-sm font-bold transition-all ${
                         tokenAmount === pkg.tokens
                           ? 'bg-casino-gold text-casino-dark'
@@ -271,8 +289,8 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
                 
                 <motion.button
                   onClick={() => {
-                    setIsOpen(false);
-                    setStatus('');
+                    if (isPurchasing) return;
+                    closeModal();
                   }}
                   disabled={isPurchasing}
                   whileHover={{ scale: 1.02 }}
@@ -301,4 +319,3 @@ export default function BuyTokens({ onPurchaseComplete }: BuyTokensProps) {
     </>
   );
 }
-
