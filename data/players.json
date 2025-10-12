@@ -24,12 +24,12 @@
   {
     "userId": "user_33tQUWfzlNyjP4z5SmoHB6Dxm5X",
     "username": "The Monkeys",
-    "balance": 4,
+    "balance": 3,
     "totalWins": 0,
-    "totalLosses": 20,
+    "totalLosses": 21,
     "biggestWin": 0,
-    "gamesPlayed": 20,
+    "gamesPlayed": 21,
     "createdAt": "2025-10-10T22:05:11.851Z",
-    "lastPlayed": "2025-10-12T00:18:44.513Z"
+    "lastPlayed": "2025-10-12T00:18:52.484Z"
   }
 ]
