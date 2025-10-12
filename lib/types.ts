@@ -70,5 +70,11 @@ export const PAYOUT_TABLE: PayoutTable = {
   '🍆🍆': { multiplier: 4, name: 'Double Eggplant' },
   '🍑🍑': { multiplier: 3, name: 'Double Peach' },
   '☠️☠️': { multiplier: 3, name: 'Double Skull' },
+  '🤡🤡': { multiplier: 3, name: 'Double Clown' },
+  '🌈🌈': { multiplier: 3, name: 'Double Rainbow' },
+  '😻😻': { multiplier: 3, name: 'Double Cat' },
+  '🌮🌮': { multiplier: 3, name: 'Double Taco' },
+  '🍄🍄': { multiplier: 3, name: 'Double Shroom' },
+  '🧀🧀': { multiplier: 2, name: 'Double Cheese' },
+  '🚬🚬': { multiplier: 2, name: 'Double Smoke' },
 };
-
