@@ -31,5 +31,16 @@
     "gamesPlayed": 24,
     "createdAt": "2025-10-10T22:05:11.851Z",
     "lastPlayed": "2025-10-12T00:19:16.401Z"
+  },
+  {
+    "userId": "user_341pfm8Ye1bDRICzMDXGQSu4Cj7",
+    "username": "jude",
+    "balance": 10,
+    "totalWins": 0,
+    "totalLosses": 0,
+    "biggestWin": 0,
+    "gamesPlayed": 0,
+    "createdAt": "2025-10-13T21:30:56.264Z",
+    "lastPlayed": "2025-10-13T21:30:56.264Z"
   }
 ]
