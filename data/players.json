@@ -35,12 +35,12 @@
   {
     "userId": "user_341pfm8Ye1bDRICzMDXGQSu4Cj7",
     "username": "jude",
-    "balance": 10,
-    "totalWins": 0,
+    "balance": 12,
+    "totalWins": 1,
     "totalLosses": 0,
-    "biggestWin": 0,
-    "gamesPlayed": 0,
+    "biggestWin": 3,
+    "gamesPlayed": 1,
     "createdAt": "2025-10-13T21:30:56.264Z",
-    "lastPlayed": "2025-10-13T21:30:56.264Z"
+    "lastPlayed": "2025-10-13T21:31:12.748Z"
   }
 ]
