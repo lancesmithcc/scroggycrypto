@@ -25,6 +25,11 @@ export default function RootLayout({
       <html lang="en">
         <head>
           <Script
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6833507242179313"
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+          <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-1HC4H5NBB8"
             strategy="afterInteractive"
           />
