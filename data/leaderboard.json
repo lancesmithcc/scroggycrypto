@@ -1,16 +1,16 @@
 [
   {
+    "userId": "user_33shjI4Z2oK2edXzw7fd6DwqViF",
+    "username": "deej",
+    "balance": 591,
+    "totalWins": 9,
+    "rank": 1
+  },
+  {
     "userId": "user_33sfeKIdxc3nBnbtGBDlef94RMk",
     "username": "scroggy",
     "balance": 537,
     "totalWins": 19,
-    "rank": 1
-  },
-  {
-    "userId": "user_33shjI4Z2oK2edXzw7fd6DwqViF",
-    "username": "deej",
-    "balance": 151,
-    "totalWins": 8,
     "rank": 2
   },
   {
