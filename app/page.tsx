@@ -11,7 +11,7 @@ export default function Home() {
             <span className="text-8xl animate-bounce-slow">🧙‍♂️</span>
           </div>
           <h1 className="text-7xl font-extrabold glow-gold animate-pulse-fast">
-            Scroggy's Casino
+            Scroggy&apos;s Casino
           </h1>
           <p className="text-2xl text-casino-gold font-semibold">
             Where Magic Meets Fortune! 🎰✨
@@ -26,7 +26,7 @@ export default function Home() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-4xl">🧙‍♂️</span>
             <p className="text-xl text-gray-300 italic">
-              "Step into my magical casino and test your luck!"
+              &quot;Step into my magical casino and test your luck!&quot;
             </p>
             <span className="text-4xl">✨</span>
           </div>

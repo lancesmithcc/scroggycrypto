@@ -124,7 +124,7 @@ export default function SolanaDonate() {
           >
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">☀️</div>
-              <h2 className="text-3xl font-bold text-white mb-2">Support Scroggy's Casino</h2>
+              <h2 className="text-3xl font-bold text-white mb-2">Support Scroggy&apos;s Casino</h2>
               <p className="text-gray-300 text-sm">
                 Help keep the casino running and pay for transaction fees!
               </p>
@@ -249,7 +249,7 @@ export default function SolanaDonate() {
                   rel="noopener noreferrer"
                   className="text-purple-400 hover:text-purple-300 text-xs underline"
                 >
-                  Don't have Phantom? Get it here →
+                  Don&apos;t have Phantom? Get it here →
                 </a>
               </div>
 

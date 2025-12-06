@@ -236,7 +236,7 @@ export default function SlotMachine({ onSpin, balance, disabled = false }: SlotM
               <div className="absolute bottom-4 -right-3 w-0 h-0 border-t-[15px] border-t-transparent border-l-[20px] border-l-white border-b-[15px] border-b-transparent"></div>
               
               <p className="text-lg font-bold italic leading-tight">
-                "{characterComment.comment}"
+                &quot;{characterComment.comment}&quot;
               </p>
             </motion.div>
 

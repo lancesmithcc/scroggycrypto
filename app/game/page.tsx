@@ -230,7 +230,7 @@ export default function GamePage() {
             >
               <span className="text-4xl md:text-6xl lg:text-8xl">🧙‍♂️</span>
               <h1 className="text-2xl md:text-5xl lg:text-6xl font-extrabold text-casino-gold glow-gold">
-                SCROGGY'S CASINO
+                SCROGGY&apos;S CASINO
               </h1>
             </div>
           </Link>
@@ -283,7 +283,7 @@ export default function GamePage() {
                         <div className="absolute bottom-6 -right-4 w-0 h-0 border-t-[20px] border-t-transparent border-l-[25px] border-l-white border-b-[20px] border-b-transparent"></div>
                         
                         <p className="text-2xl font-bold italic leading-tight">
-                          "{threat.text}"
+                          &quot;{threat.text}&quot;
                         </p>
                         
                         {/* Voice waveform animation */}
